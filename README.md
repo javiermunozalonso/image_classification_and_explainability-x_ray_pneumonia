@@ -5,7 +5,7 @@
 [From Kaggle](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)
 
 
-![Figure_1](./doc/images/figure_1.png)
+![Figure_1](./doc/resources/figure_1.png)
 
 Figure 1. Illustrative Examples of Chest X-Rays in Patients with Pneumonia
 
