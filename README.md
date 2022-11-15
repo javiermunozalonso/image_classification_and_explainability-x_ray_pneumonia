@@ -4,7 +4,6 @@
 
 [From Kaggle](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)
 
-
 ![Figure_1](./doc/resources/figure_1.png)
 
 Figure 1. Illustrative Examples of Chest X-Rays in Patients with Pneumonia
@@ -41,8 +40,12 @@ conda env create -f environment.yml
 
 ### Create Kaggle API Token
 
-If you don't have a API Token from kaggle you need to create one to follow the steps or you can download manually the data and set in the local location
+If you don't have a API Token from kaggle you need to create one to follow the steps or you can download manually the data and set in the local location or just download the images and set the images under the 'images' folder.
 
 ```bash
 kaggle datasets download -d paultimothymooney/chest-xray-pneumonia
 ```
+
+![Figure_2](./doc/resources/images_folder_structure.png)
+
+Figure 2. Example of how the images folder would be after download the dataset
