@@ -40,12 +40,22 @@ conda env create -f environment.yml
 
 ### Create Kaggle API Token
 
-If you don't have a API Token from kaggle you need to create one to follow the steps or you can download manually the data and set in the local location or just download the images and set the images under the 'images' folder.
+If you don't have a API Token from kaggle you need to create one to follow the steps.
 
 ```bash
 kaggle datasets download -d paultimothymooney/chest-xray-pneumonia
 ```
 
-![Figure_2](./doc/resources/images_folder_structure.png)
+Or you can just download manually the data set and save it in the 'images' folder.
 
-Figure 2. Example of how the images folder would be after download the dataset
+    images
+    └───chest_xray
+        ├───test
+        │   ├───NORMAL
+        │   └───PNEUMONIA
+        ├───train
+        │   ├───NORMAL
+        │   └───PNEUMONIA
+        └───val
+            ├───NORMAL
+            └───PNEUMONIA
