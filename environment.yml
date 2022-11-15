@@ -6,3 +6,5 @@ dependencies:
   - pip
   - pip:
       - -r requirements.txt
+  - cudatoolkit=11.2
+  - cudnn=8.2.1
