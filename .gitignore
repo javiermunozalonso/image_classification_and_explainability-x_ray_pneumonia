@@ -137,3 +137,6 @@ images/
 
 # Models files
 *.h5
+
+# log files
+*.v2
