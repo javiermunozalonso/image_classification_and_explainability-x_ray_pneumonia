@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List, Tuple
 from dataset import DatasetFolder, ImagesDataset
@@ -8,20 +8,21 @@ import tensorflow as tf
 import numpy as np
 
 GLOBAL_EPOCHS = 30
-BATCH_SIZE = 16
+# BATCH_SIZE = 8
 INPUT_SHAPE = (220, 220, 3) # color_mode = rgb
 
 @dataclass
-class ModelBuilder:
+class ModelHandler:
     train_dataset: List[str]
     test_dataset: List[str]
     validation_dataset: List[str]
     optimizer: tf.keras.optimizers.Optimizer = None
     loss: tf.keras.losses.Loss = None
-    _model: tf.keras.Model = None
-    _model_name: str = None
-    _batch_size: int = BATCH_SIZE
-    _epochs: int = GLOBAL_EPOCHS
+    __model: tf.keras.Model = None
+    __model_name: str = None
+    __batch_size: int = field(init=True, default=None, repr=False)
+    __epochs: int = field(init=True, default=None, repr=False)
+    __class_weights: Dict[int, float] = None # GLOBAL_EPOCHS
 
     @property
     def callbacks(self) -> List[tf.keras.callbacks.Callback]:
@@ -44,37 +45,38 @@ class ModelBuilder:
                 ]
 
     @property
+    def batch_size(self) -> int:
+        return self.__batch_size
+
+    @batch_size.setter
+    def batch_size(self, new_batch_size: int) -> None:
+        self.__batch_size = new_batch_size
+
+    @property
     def class_weights(self) -> Dict[int, float]:
-        return {
-                ClassificationNames.PNEUMONIA.value: 1.0,
-                ClassificationNames.NORMAL.value: 0.5
-                }
+        return self.__class_weights
+
+    @class_weights.setter
+    def class_weights(self, new_class_weights: Dict[int, float]) -> None:
+        self.__class_weights = new_class_weights
 
     @property
     def model_path(self) -> str:
         return f'{self.model_name}.h5'
 
     @property
-    def batch_size(self) -> int:
-        return self._batch_size
-
-    @batch_size.setter
-    def set_batch_size(self, new_batch_size: int):
-        self._batch_size = new_batch_size
-
-    @property
     def epochs(self) -> int:
-        return self._epochs
+        return self.__epochs
 
     @epochs.setter
-    def set_epochs(self, epochs: int):
-        self.epochs = epochs
+    def epochs(self, new_epochs: int) -> None:
+        self.__epochs = new_epochs
 
     @property
     def model_name(self) -> str:
-        if not self._model_name:
-            self._model_name = f'model_{datetime.now().strftime("%Y%m%d_%H%M%S")}'
-        return self._model_name
+        if not self.__model_name:
+            self.__model_name = f'model_{datetime.now().strftime("%Y%m%d_%H%M%S")}'
+        return self.__model_name
 
     def add_metrics(self):
         self.metrics = list(set(self.metrics.append(tf.keras.metrics.binary_accuracy)))
@@ -109,31 +111,27 @@ class ModelBuilder:
 
         output = tf.keras.layers.Dense(1, activation='sigmoid')(x)
 
-        self._model = tf.keras.Model(inputs=[inputs], outputs=output, name=self.model_name)
+        self.__model = tf.keras.Model(inputs=[inputs], outputs=output, name=self.model_name)
 
-        self._model.compile(optimizer=self.optimizer,
+        self.__model.compile(optimizer=self.optimizer,
                             loss=self.loss,
                             metrics=self.metrics)
 
-        self._model.summary()
-        return self._model
+        self.__model.summary()
+        return self.__model
 
     def train(self):
-        history_fit = self._model.fit(x=self.train_dataset,
+        history_fit = self.__model.fit(x=self.train_dataset,
                         epochs=self.epochs,
                         batch_size=self.batch_size,
                         validation_data=self.test_dataset,
                         callbacks=self.callbacks,
                         class_weight=self.class_weights)
-        self._model.save(self.model_path)
+        self.__model.save(self.model_path)
         return history_fit
 
     def evaluate(self):
-        return self._model.evaluate(x=self.validation_dataset,
+        evaluate_results = self.__model.evaluate(x=self.validation_dataset,
                                                 batch_size=self.batch_size)
-
-    # def predict_model(self, image_path: str) -> Tuple[int, float]:
-    #     prediction = self._model.predict(image_path)
-    #     return np.argmax(prediction),\
-    #             np.max(prediction),\
-    #             ClassificationNames.to_array[np.argmax(prediction)]
+        # evaluation_metrics_names =
+        return dict(zip(self.__model.metrics_names, evaluate_results))
