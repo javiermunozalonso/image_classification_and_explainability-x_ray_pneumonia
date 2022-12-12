@@ -140,3 +140,6 @@ images/
 
 # log files
 *.v2
+
+# mlruns
+mlruns/
