@@ -18,5 +18,14 @@
 		"titleBar.inactiveBackground": "#00000099",
 		"titleBar.inactiveForeground": "#e7e7e799"
 	},
-	"peacock.color": "black"
+	"peacock.color": "black",
+	"cSpell.words": [
+		"autolog",
+		"crossentropy",
+		"Crossentropy",
+		"hyperparametrized",
+		"keras",
+		"mlflow",
+		"tensorflow"
+	]
 }
