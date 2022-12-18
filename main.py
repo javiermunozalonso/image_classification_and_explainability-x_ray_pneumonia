@@ -1,6 +1,6 @@
 import logging
 
-from experiments import run_fixed_experiment, run_hyperparametryzed_experiment
+from experiments import run_hyperparametryzed_experiment
 
 import time
 
@@ -14,8 +14,6 @@ def run():
     mlflow.set_experiment(experiment_name="pneumonia_classification")
     mlflow.set_tracking_uri(uri='./mlruns')
     with mlflow.start_run():
-        mlflow.autolog()
-        mlflow.tensorflow.autolog()
         # run_fixed_experiment()
         run_hyperparametryzed_experiment()
 
