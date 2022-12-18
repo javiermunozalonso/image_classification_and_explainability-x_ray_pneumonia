@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Dict, List
-from hyperopt import STATUS_OK, fmin, Trials, tpe
 
 import tensorflow as tf
 
@@ -30,8 +29,8 @@ class ModelHandler:
                 tf.keras.metrics.BinaryAccuracy(),
                 tf.keras.metrics.BinaryCrossentropy(),
                 tf.keras.metrics.BinaryIoU(),
-                tf.keras.metrics.Precision(),
-                tf.keras.metrics.Recall(),
+                tf.keras.metrics.Precision(name='precision'),
+                tf.keras.metrics.Recall(name='recall'),
                 tf.keras.metrics.AUC(name='AUC_ROC',curve='ROC'),
                 tf.keras.metrics.AUC(name='AUC_PR',curve='PR'),
                 tf.keras.metrics.FalseNegatives(),
