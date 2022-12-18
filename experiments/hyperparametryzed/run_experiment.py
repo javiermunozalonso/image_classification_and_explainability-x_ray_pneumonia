@@ -1,14 +1,10 @@
 import logging
 from config import ClassificationNames
 
-from tensorflow.keras.losses import BinaryCrossentropy
-from tensorflow.keras.optimizers import Adam
 import pprint
 
 from dataset import create_train_test_validation_dataset
 from model.model_hyperparametrized_handler import ModelHyperparametrizedHandler
-
-import time
 
 import mlflow
 
@@ -20,30 +16,19 @@ def run_experiment():
     logging.info('Init run')
     [train_dataset, validation_dataset, test_dataset] = create_train_test_validation_dataset()
 
-    learning_rate: float = 1.e-8
-    batch_size: int = 8
-    epochs: int = 10
-    pneumonia_weight: float = .5
-    normal_weight: float = 1
-
     model_handler = ModelHyperparametrizedHandler(train_dataset = train_dataset,
                                     test_dataset = test_dataset,
-                                    validation_dataset = validation_dataset,
-                                    loss = BinaryCrossentropy(),
-                                    optimizer = Adam(learning_rate = learning_rate))
-
-
-    model_handler.batch_size = batch_size
-    model_handler.epochs = epochs
-    model_handler.class_weights = {
-                                    ClassificationNames.PNEUMONIA.value: pneumonia_weight,
-                                    ClassificationNames.NORMAL.value: normal_weight
-                                }
+                                    validation_dataset = validation_dataset)
 
     best_params = model_handler.get_best_params_for_model()
 
-    model_handler.set_best_params(best_params)
+    mlflow.log_dict(best_params, artifact_file='best_params.json')
 
+    mlflow.autolog()
+    mlflow.tensorflow.autolog()
+
+    model_handler.set_params(best_params)
+    model_handler.build()
     train_results = model_handler.train()
 
     logging.info(train_results)
@@ -57,7 +42,6 @@ def run_experiment():
     print(evaluate_results)
 
     mlflow.log_metrics(evaluate_results)
-    mlflow.log_dict(evaluate_results, artifact_file='evaluation_results.json')
 
     test_confusion_matrix_figure = create_confusion_matrix_artifact(true_positive=evaluate_results['evaluation_true_positives'],
                                                         true_negative=evaluate_results['evaluation_true_negatives'],
