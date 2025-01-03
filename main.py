@@ -1,38 +1,27 @@
-from tensorflow.keras.losses import BinaryCrossentropy
-from tensorflow.keras.optimizers import Adam
-
 import logging
 
-from dataset import create_train_test_validation_dataset
-from model.model_builder import ModelBuilder
+from experiments import run_hyperparametryzed_experiment
 
-LEARNING_RATE=0.0001
+import time
+
+import mlflow
+
+logging.basicConfig(encoding='utf-8', level=logging.INFO)
 
 def run():
-    logging.info('Init run')
-    [train_dataset, validation_dataset, test_dataset] = create_train_test_validation_dataset
-    
-    model_builder = ModelBuilder(train_dataset=train_dataset,
-                                    test_dataset=test_dataset,
-                                    validation_dataset=validation_dataset,
-                                    loss=BinaryCrossentropy(),
-                                    optimizer=Adam(learning_rate=LEARNING_RATE),
-    )
-    
-    model_builder.build()
-    
-    history = model_builder.train()
-    
-    logging.info(history)
-    
-    evaluate_results = model_builder.evaluate()
-    
-    logging.info(evaluate_results)
-    
-    logging.info('end run')
-    return
+    logging.info('Init main')
+    st = time.time()
+    mlflow.set_experiment(experiment_name="pneumonia_classification")
+    mlflow.set_tracking_uri(uri='./mlruns')
+    with mlflow.start_run():
+        # run_fixed_experiment()
+        run_hyperparametryzed_experiment()
+
+    et = time.time()
+    elapsed_time = et - st
+    print('Execution time:', elapsed_time, 'seconds')
+
+    logging.info('End main')
 
 if __name__ == '__main__':
-    logging.info('Init main')
     run()
-    logging.info('End main')
